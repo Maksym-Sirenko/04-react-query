@@ -1,0 +1,21 @@
+.container {
+    max-width: 1440px;
+    margin: 0 auto 12px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button {
+    padding: 12px 20px;
+    font-size: 14px;
+    background-color: #114c86;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #021e3a;
+}
