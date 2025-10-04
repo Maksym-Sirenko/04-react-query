@@ -17,3 +17,6 @@ export const notifyFill = () =>
 
 export const notifyEmpty = () =>
   notify({ message: "No movies found for your request.", icon: "❔" });
+
+// export const notifyError = () =>
+//   notify({ message: "Something went wrong. Please try again.", icon: "⚠️" });

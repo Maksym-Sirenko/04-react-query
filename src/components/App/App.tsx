@@ -18,44 +18,40 @@ const App = () => {
   const [query, setQuery] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  });
-
-  const { data, error, isLoading, isError, isSuccess } = useQuery({
+  const { data, isLoading, isError, isSuccess, isFetching } = useQuery({
     queryKey: ["movies", query, currentPage],
     queryFn: () => fetchMovies(query, currentPage),
     enabled: query !== "",
     placeholderData: keepPreviousData,
   });
 
-  //
+  const movies = data?.results ?? [];
+  const totalPages = data?.total_pages ?? 0;
+
+  useEffect(() => {
+    if (isSuccess && (data?.results?.length ?? 0) === 0) {
+      notifyEmpty();
+    }
+  }, [isSuccess, data?.results]);
 
   const handleSearch = async (topic: string) => {
     setQuery(topic);
     setCurrentPage(1);
   };
 
-  const openModal = (film: Movie) => {
-    setSelectedMovie(film);
+  const openModal = (movie: Movie) => {
+    setSelectedMovie(movie);
   };
 
   const closeModal = () => {
     setSelectedMovie(null);
   };
 
-  const movies = data?.results || [];
-  const totalPages = data?.total_pages || 0;
-
-  if (isSuccess && movies.length === 0) {
-    notifyEmpty();
-  }
-
   return (
     <>
       <SearchBar onSubmit={handleSearch} />
 
-      {isSuccess && totalPages > 1 && (
+      {isSuccess && totalPages > 1 && !isFetching && (
         <ReactPaginate
           pageCount={totalPages}
           pageRangeDisplayed={5}
@@ -64,16 +60,16 @@ const App = () => {
           forcePage={currentPage - 1}
           containerClassName={css.pagination}
           activeClassName={css.active}
+          renderOnZeroPageCount={null}
           nextLabel="→"
           previousLabel="←"
         />
       )}
 
-      {movies.length > 0 && <MovieGrid movies={movies} onSelect={openModal} />}
-
-      {isLoading && <Loader />}
-
+      {(isLoading || isFetching) && <Loader />}
       {isError && <ErrorMessage />}
+
+      {movies.length > 0 && <MovieGrid movies={movies} onSelect={openModal} />}
 
       {selectedMovie && (
         <MovieModal onClose={closeModal} movie={selectedMovie} />
